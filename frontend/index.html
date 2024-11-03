@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прошивки устройств</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        let port;
+
+        async function showFirmwarePage(device) {
+            let firmwareButtons = '';
+
+            switch (device) {
+                case 'Cardputer':
+                    firmwareButtons = `
+                        <button class="device-button" onclick="openSerialPort('${device}', 'Bruce.bin')">Прошить Bruce</button>
+                    `;
+                    break;
+                case 'Wemos D1 Mini':
+                    firmwareButtons = `
+                        <button class="device-button" onclick="openSerialPort('${device}', 'Deauther.bin')">Прошить Deauther</button>
+                        <button class="device-button" onclick="openSerialPort('${device}', 'NetherCap.bin')">Прошить NetherCap</button>
+                    `;
+                    break;
+                case 'M5Stick C 2 Plus':
+                    firmwareButtons = `
+                        <button class="device-button" onclick="openSerialPort('${device}', 'Nemo.bin')">Прошить Nemo</button>
+                        <button class="device-button" onclick="openSerialPort('${device}', 'Bruce.bin')">Прошить Bruce</button>
+                        <button class="device-button" onclick="openSerialPort('${device}', 'CatHack.bin')">Прошить CatHack</button>
+                    `;
+                    break;
+                case 'M5Stick C 1.1 Plus':
+                    firmwareButtons = `
+                        <button class="device-button" onclick="openSerialPort('${device}', 'Bruce.bin')">Прошить Bruce</button>
+                    `;
+                    break;
+                case 'ESP32 Cyd':
+                    firmwareButtons = `
+                        <button class="device-button" onclick="openSerialPort('${device}', 'Bruce.bin')">Прошить Bruce</button>
+                        <button class="device-button" onclick="openSerialPort('${device}', 'Marauder.bin')">Прошить Marauder</button>
+                    `;
+                    break;
+            }
+
+            document.body.innerHTML = `
+                <header>
+                    <h1>Прошивки для ${device}</h1>
+                </header>
+                <main>
+                    <section>
+                        <h2>${device}</h2>
+                        ${firmwareButtons}
+                        <button class="device-button" onclick="goBack()">Назад</button>
+                    </section>
+                </main>
+                <footer>
+                    <p>&copy; 2024 Прошивки устройств</p>
+                </footer>
+            `;
+        }
+
+        async function openSerialPort(device, firmware) {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                alert(`Выбран COM-порт для ${device}. Прошивка ${firmware} начнется...`);
+                // Здесь можно добавить код для загрузки прошивки
+            } catch (err) {
+                console.error("Ошибка доступа к COM-порту: ", err);
+            }
+        }
+
+        function goBack() {
+            location.reload();
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Прошивки для устройств</h1>
+    </header>
+    <main>
+        <section class="device-section">
+            <h2>M5Stack Cardputer</h2>
+            <button class="device-button" onclick="showFirmwarePage('Cardputer')">Прошить</button>
+        </section>
+        <section class="device-section">
+            <h2>Wemos D1 Mini</h2>
+            <button class="device-button" onclick="showFirmwarePage('Wemos D1 Mini')">Прошить</button>
+        </section>
+        <section class="device-section">
+            <h2>M5Stick C 2 Plus</h2>
+            <button class="device-button" onclick="showFirmwarePage('M5Stick C 2 Plus')">Прошить</button>
+        </section>
+        <section class="device-section">
+            <h2>M5Stick C 1.1 Plus</h2>
+            <button class="device-button" onclick="showFirmwarePage('M5Stick C 1.1 Plus')">Прошить</button>
+        </section>
+        <section class="device-section">
+            <h2>ESP32 Cyd</h2>
+            <button class="device-button" onclick="showFirmwarePage('ESP32 Cyd')">Прошить</button>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Прошивки устройств</p>
+    </footer>
+</body>
+</html>
