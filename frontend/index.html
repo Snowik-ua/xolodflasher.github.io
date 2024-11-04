@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Прошивки устройств</title>
+    <title>xolodflasher</title>
     <link rel="stylesheet" href="style.css">
     <script>
         let port;
@@ -14,38 +14,39 @@
             switch (device) {
                 case 'Cardputer':
                     firmwareButtons = `
-                        <button class="device-button" onclick="openSerialPort('${device}', 'Bruce.bin')">Прошить Bruce</button>
+                        <button class="device-button" onclick="selectFirmware('${device}', 'Bruce.bin')">Прошить Bruce</button>
                     `;
                     break;
                 case 'Wemos D1 Mini':
                     firmwareButtons = `
-                        <button class="device-button" onclick="openSerialPort('${device}', 'Deauther.bin')">Прошить Deauther</button>
-                        <button class="device-button" onclick="openSerialPort('${device}', 'NetherCap.bin')">Прошить NetherCap</button>
+                        <button class="device-button" onclick="selectFirmware('${device}', 'Deauther.bin')">Прошить Deauther</button>
+                        <button class="device-button" onclick="selectFirmware('${device}', 'NetherCap.bin')">Прошить NetherCap</button>
                     `;
                     break;
                 case 'M5Stick C 2 Plus':
                     firmwareButtons = `
-                        <button class="device-button" onclick="openSerialPort('${device}', 'Nemo.bin')">Прошить Nemo</button>
-                        <button class="device-button" onclick="openSerialPort('${device}', 'Bruce.bin')">Прошить Bruce</button>
-                        <button class="device-button" onclick="openSerialPort('${device}', 'CatHack.bin')">Прошить CatHack</button>
+                        <button class="device-button" onclick="selectFirmware('${device}', 'Nemo.bin')">Прошить Nemo</button>
+                        <button class="device-button" onclick="selectFirmware('${device}', 'Bruce.bin')">Прошить Bruce</button>
+                        <button class="device-button" onclick="selectFirmware('${device}', 'CatHack.bin')">Прошить CatHack</button>
                     `;
                     break;
                 case 'M5Stick C 1.1 Plus':
                     firmwareButtons = `
-                        <button class="device-button" onclick="openSerialPort('${device}', 'Bruce.bin')">Прошить Bruce</button>
+                        <button class="device-button" onclick="selectFirmware('${device}', 'Bruce.bin')">Прошить Bruce</button>
                     `;
                     break;
                 case 'ESP32 Cyd':
                     firmwareButtons = `
-                        <button class="device-button" onclick="openSerialPort('${device}', 'Bruce.bin')">Прошить Bruce</button>
-                        <button class="device-button" onclick="openSerialPort('${device}', 'Marauder.bin')">Прошить Marauder</button>
+                        <button class="device-button" onclick="selectFirmware('${device}', 'Bruce.bin')">Прошить Bruce</button>
+                        <button class="device-button" onclick="selectFirmware('${device}', 'Marauder.bin')">Прошить Marauder</button>
                     `;
                     break;
             }
 
             document.body.innerHTML = `
                 <header>
-                    <h1>Прошивки для ${device}</h1>
+                    <h1>xolodflasher</h1>
+                    <p>лучший прошивальщик для вашего устройства</p>
                 </header>
                 <main>
                     <section>
@@ -55,19 +56,33 @@
                     </section>
                 </main>
                 <footer>
-                    <p>&copy; 2024 Прошивки устройств</p>
+                    <p>dev: <a href="https://t.me/m5stick">@m5stick</a> <a href="https://t.me/xolodflasher">@xolodflasher</a></p>
                 </footer>
             `;
         }
 
-        async function openSerialPort(device, firmware) {
+        async function selectFirmware(device, firmware) {
             try {
                 port = await navigator.serial.requestPort();
                 await port.open({ baudRate: 115200 });
                 alert(`Выбран COM-порт для ${device}. Прошивка ${firmware} начнется...`);
-                // Здесь можно добавить код для загрузки прошивки
+
+                const response = await fetch(`firmwares/${firmware}`);
+                const firmwareData = await response.blob();
+                
+                const reader = firmwareData.stream().getReader();
+                const writer = port.writable.getWriter();
+
+                let result;
+                while (!(result = await reader.read()).done) {
+                    await writer.write(result.value);
+                }
+
+                writer.releaseLock();
+                alert(`Прошивка ${firmware} завершена!`);
             } catch (err) {
                 console.error("Ошибка доступа к COM-порту: ", err);
+                alert("Не удалось открыть COM-порт или выполнить прошивку.");
             }
         }
 
@@ -78,7 +93,8 @@
 </head>
 <body>
     <header>
-        <h1>Прошивки для устройств</h1>
+        <h1>xolodflasher</h1>
+        <p>лучший прошивальщик для вашего устройства</p>
     </header>
     <main>
         <section class="device-section">
@@ -103,7 +119,7 @@
         </section>
     </main>
     <footer>
-        <p>&copy; 2024 Прошивки устройств</p>
+        <p>dev: <a href="https://t.me/m5stick">@m5stick</a> <a href="https://t.me/xolodflasher">@xolodflasher</a></p>
     </footer>
 </body>
 </html>
